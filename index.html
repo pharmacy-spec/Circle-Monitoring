@@ -356,7 +356,7 @@
     };
 
     let config = { ...defaultConfig };
-    let supabaseClient = null;
+    let supabaseDb = null;
     let isConnected = false;
     let attendanceChart = null;
 
@@ -412,10 +412,10 @@
       }
 
       try {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseDb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // Test connection
-        const { data, error } = await supabaseClient.from('personil').select('*');
+        const { data, error } = await supabaseDb.from('personil').select('*');
         
         if (error) throw error;
 
@@ -451,19 +451,19 @@
 
       try {
         // Load personil
-        const { data: personil } = await supabaseClient.from('personil').select('*').order('nama');
+        const { data: personil } = await supabaseDb.from('personil').select('*').order('nama');
         personilList = personil || [];
 
         // Load sesi
-        const { data: sesi } = await supabaseClient.from('sesi_circle').select('*').order('tanggal', { ascending: false });
+        const { data: sesi } = await supabaseDb.from('sesi_circle').select('*').order('tanggal', { ascending: false });
         sesiList = sesi || [];
 
         // Load problems
-        const { data: problems } = await supabaseClient.from('problem_sharing').select('*').order('created_at', { ascending: false });
+        const { data: problems } = await supabaseDb.from('problem_sharing').select('*').order('created_at', { ascending: false });
         problemList = problems || [];
 
         // Load improvements
-        const { data: improvements } = await supabaseClient.from('improvement').select('*').order('created_at', { ascending: false });
+        const { data: improvements } = await supabaseDb.from('improvement').select('*').order('created_at', { ascending: false });
         improvementList = improvements || [];
 
         // Update all UIs
@@ -516,7 +516,7 @@
       }
 
       try {
-        const { error } = await supabaseClient.from('personil').insert({ nama, area });
+        const { error } = await supabaseDb.from('personil').insert({ nama, area });
         if (error) throw error;
 
         document.getElementById('new-personil-name').value = '';
@@ -531,7 +531,7 @@
       if (!isConnected) return;
 
       try {
-        const { error } = await supabaseClient.from('personil').delete().eq('id', id);
+        const { error } = await supabaseDb.from('personil').delete().eq('id', id);
         if (error) throw error;
 
         showToast('Personil berhasil dihapus', 'success');
@@ -720,7 +720,7 @@
         const fotoCircle = await fileToBase64(document.getElementById('input-foto-circle').files[0]);
 
         // Insert sesi
-        const { data: sesiData, error: sesiError } = await supabaseClient.from('sesi_circle').insert({
+        const { data: sesiData, error: sesiError } = await supabaseDb.from('sesi_circle').insert({
           tanggal,
           shift,
           personil_hadir: personilHadir,
@@ -741,7 +741,7 @@
             ? await fileToBase64(document.getElementById('input-foto-problem').files[0]) 
             : null;
           
-          await supabaseClient.from('problem_sharing').insert({
+          await supabaseDb.from('problem_sharing').insert({
             sesi_id: sesiData.id,
             problem,
             solusi: document.getElementById('input-solusi').value,
@@ -756,7 +756,7 @@
             ? await fileToBase64(document.getElementById('input-foto-improvement').files[0])
             : null;
 
-          await supabaseClient.from('improvement').insert({
+          await supabaseDb.from('improvement').insert({
             sesi_id: sesiData.id,
             pic: document.getElementById('input-pic').value,
             detail: improvement,
@@ -1036,5 +1036,5 @@
       await autoConnect();
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bd32c8a70fdf91e',t:'MTc2ODI4OTI3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bd3311f92f2f91e',t:'MTc2ODI4OTQ2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
