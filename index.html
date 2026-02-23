@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="id" class="h-full">
- <head>
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Circle Monitoring System</title>
@@ -10,364 +10,305 @@
   <script src="/_sdk/element_sdk.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <style>
-    body {
-      box-sizing: border-box;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .tab-active {
-      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      color: white;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-    }
-    .card-gradient {
-      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    }
-    .header-gradient {
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #0ea5e9 100%);
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      transition: all 0.3s ease;
-    }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-    }
-    .btn-danger {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    }
-    .btn-danger:hover {
-      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    }
-    .btn-success {
-      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-    }
-    .btn-success:hover {
-      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-    }
-    .input-styled {
+    * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .tab-active { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+    .card-gradient { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
+    .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); transition: all 0.3s ease; }
+    .btn-primary:hover { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+    .btn-secondary { background: linear-gradient(135deg, #64748b 0%, #475569 100%); }
+    .btn-secondary:hover { background: linear-gradient(135deg, #475569 0%, #334155 100%); }
+    .input-styled { transition: all 0.2s ease; border: 2px solid #e2e8f0; }
+    .input-styled:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); outline: none; }
+    .modal-overlay { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+    .stat-card { background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); border-left: 4px solid; }
+    .photo-thumbnail { cursor: pointer; transition: transform 0.2s ease; }
+    .photo-thumbnail:hover { transform: scale(1.05); }
+    .fade-in { animation: fadeIn 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .loading-spinner { border: 3px solid #f3f4f6; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .toast { animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .camera-badge { background: rgba(59, 130, 246, 0.1); border: 1px dashed #3b82f6; }
+    .camera-button { transition: all 0.2s; }
+    .camera-button:hover { background: #3b82f6; color: white; }
+    
+    /* Style baru untuk timeline */
+    .card-sesi {
       transition: all 0.2s ease;
-      border: 2px solid #e2e8f0;
+      border-left: 4px solid transparent;
     }
-    .input-styled:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    .card-sesi:hover {
+      transform: translateX(4px);
     }
-    .checkbox-styled:checked {
-      background-color: #3b82f6;
-      border-color: #3b82f6;
+    .card-sesi.has-problem {
+      border-left-color: #f59e0b;
     }
-    .modal-overlay {
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
+    .card-sesi.has-improvement {
+      border-left-color: #10b981;
     }
-    .stat-card {
-      background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-      border-left: 4px solid;
+    .card-sesi.has-both {
+      border-left-color: #8b5cf6;
     }
-    .photo-thumbnail {
-      cursor: pointer;
-      transition: transform 0.2s ease;
+    .badge-problem {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     }
-    .photo-thumbnail:hover {
-      transform: scale(1.05);
-    }
-    .fade-in {
-      animation: fadeIn 0.3s ease-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .loading-spinner {
-      border: 3px solid #f3f4f6;
-      border-top: 3px solid #3b82f6;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .toast {
-      animation: slideIn 0.3s ease-out;
-    }
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+    .badge-improvement {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     }
   </style>
   <style>@view-transition { navigation: auto; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
- </head>
- <body class="h-full bg-gradient-to-br from-slate-100 via-blue-50 to-slate-100">
-  <div id="app" class="h-full overflow-auto"><!-- Header -->
-   <header class="header-gradient text-white shadow-xl">
-    <div class="max-w-7xl mx-auto px-4 py-6">
-     <div class="flex items-center justify-between">
-      <div>
-       <h1 id="app-title" class="text-2xl md:text-3xl font-extrabold tracking-tight">Circle Monitoring PT. GOF</h1>
-       <p id="company-name" class="text-blue-100 mt-1 text-sm md:text-base">Created by MSTD - GOF</p>
+</head>
+<body class="h-full bg-gradient-to-br from-slate-100 via-blue-50 to-slate-100">
+  <div id="app" class="h-full overflow-auto">
+    <!-- Header -->
+    <header class="header-gradient text-white shadow-xl" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #0ea5e9 100%);">
+      <div class="max-w-7xl mx-auto px-4 py-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 id="app-title" class="text-2xl md:text-3xl font-extrabold tracking-tight">Circle Monitoring PT. GOF</h1>
+            <p id="company-name" class="text-blue-100 mt-1 text-sm md:text-base">Created by MSTD - GOF</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div id="connection-status" class="flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-sm">
+              <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
+              <span>Connecting...</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="flex items-center gap-3">
-       <div id="connection-status" class="flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-sm"><span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span> <span>Connecting...</span>
-       </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white shadow-md sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex gap-2 py-3 overflow-x-auto">
+          <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-active px-5 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition-all duration-300 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> Dashboard
+          </button>
+          <button onclick="switchTab('input')" id="tab-input" class="px-5 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-300 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Input Circle
+          </button>
+          <button onclick="switchTab('manage')" id="tab-manage" class="px-5 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-300 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg> Kelola Circle
+          </button>
+        </div>
       </div>
-     </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+      <!-- Dashboard Tab -->
+      <div id="content-dashboard" class="space-y-6 fade-in">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="stat-card border-l-blue-500 rounded-xl p-4 shadow-sm"><div class="text-2xl font-bold text-blue-600" id="stat-total-sesi">0</div><div class="text-slate-500 text-sm">Total Sesi Circle</div></div>
+          <div class="stat-card border-l-green-500 rounded-xl p-4 shadow-sm"><div class="text-2xl font-bold text-green-600" id="stat-total-personil">0</div><div class="text-slate-500 text-sm">Total Personil</div></div>
+          <div class="stat-card border-l-amber-500 rounded-xl p-4 shadow-sm"><div class="text-2xl font-bold text-amber-600" id="stat-total-problem">0</div><div class="text-slate-500 text-sm">Problem Sharing</div></div>
+          <div class="stat-card border-l-purple-500 rounded-xl p-4 shadow-sm"><div class="text-2xl font-bold text-purple-600" id="stat-total-improvement">0</div><div class="text-slate-500 text-sm">Improvement</div></div>
+        </div>
+
+        <!-- Attendance Chart -->
+        <div class="card-gradient rounded-2xl shadow-lg p-6">
+          <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> Chart Kehadiran Personil</h2>
+          <div class="h-64 md:h-80"><canvas id="attendance-chart"></canvas></div>
+        </div>
+
+        <!-- Timeline Sesi Circle (GABUNGAN SEMUA) -->
+        <div class="space-y-4">
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Timeline Sesi Circle
+          </h2>
+          
+          <div id="timeline-list" class="space-y-4">
+            <!-- Akan diisi JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Circle Tab -->
+      <div id="content-input" class="hidden space-y-6 fade-in">
+        <div class="card-gradient rounded-2xl shadow-lg p-6">
+          <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Input Sesi Circle Baru</h2>
+          <form id="circle-form" class="space-y-6">
+            <!-- Date & Shift -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label class="block text-sm font-semibold text-slate-700 mb-2">📅 Tanggal</label><input type="date" id="input-tanggal" required class="input-styled w-full px-4 py-3 rounded-xl outline-none"></div>
+              <div><label class="block text-sm font-semibold text-slate-700 mb-2">⏰ Shift</label><select id="input-shift" required class="input-styled w-full px-4 py-3 rounded-xl outline-none"><option value="">Pilih Shift</option><option value="Shift 1">Shift 1</option><option value="Shift 2">Shift 2</option><option value="Shift 3">Shift 3</option><option value="Longshift Pagi">Longshift Pagi</option><option value="Longshift Malam">Longshift Malam</option></select></div>
+            </div>
+
+            <!-- Personil Checklist -->
+            <div><label class="block text-sm font-semibold text-slate-700 mb-2">👥 Personil Hadir</label><div id="personil-checklist" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 bg-slate-50 rounded-xl"><div class="text-slate-400 text-sm col-span-full text-center py-4">Belum ada personil. Tambahkan di menu Kelola Circle.</div></div></div>
+
+            <!-- Teknik & QA -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-slate-50 p-4 rounded-xl"><label class="block text-sm font-semibold text-slate-700 mb-3">👷 Kehadiran Teknik</label><div class="flex items-center gap-4 mb-3"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="teknik-hadir" value="ya" class="w-4 h-4 text-blue-600"><span class="text-sm">Ya</span></label><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="teknik-hadir" value="tidak" checked class="w-4 h-4 text-blue-600"><span class="text-sm">Tidak</span></label></div><input type="text" id="input-teknik-inisial" placeholder="Inisial Teknik" class="input-styled w-full px-3 py-2 rounded-lg text-sm outline-none" disabled></div>
+              <div class="bg-slate-50 p-4 rounded-xl"><label class="block text-sm font-semibold text-slate-700 mb-3">🔍 Kehadiran QA</label><div class="flex items-center gap-4 mb-3"><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="qa-hadir" value="ya" class="w-4 h-4 text-blue-600"><span class="text-sm">Ya</span></label><label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="qa-hadir" value="tidak" checked class="w-4 h-4 text-blue-600"><span class="text-sm">Tidak</span></label></div><input type="text" id="input-qa-inisial" placeholder="Inisial QA" class="input-styled w-full px-3 py-2 rounded-lg text-sm outline-none" disabled></div>
+            </div>
+
+            <!-- SPV -->
+            <div><label class="block text-sm font-semibold text-slate-700 mb-2">👔 Inisial SPV Prod</label><input type="text" id="input-spv" required placeholder="Masukkan inisial SPV" class="input-styled w-full px-4 py-3 rounded-xl outline-none"></div>
+
+            <!-- Photo Circle dengan opsi kamera/galeri -->
+            <div class="border-2 border-blue-200 rounded-xl p-4 bg-blue-50/30">
+              <label class="block text-sm font-semibold text-slate-700 mb-3">📸 Foto Circle <span class="text-red-500">*</span></label>
+              <div class="flex flex-wrap gap-3 mb-3">
+                <button type="button" onclick="openCamera('circle')" class="camera-button flex-1 bg-white border-2 border-blue-500 text-blue-600 py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-blue-500 hover:text-white transition-all">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  Buka Kamera
+                </button>
+                <button type="button" onclick="openGallery('circle')" class="camera-button flex-1 bg-white border-2 border-slate-500 text-slate-600 py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-slate-500 hover:text-white transition-all">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  Pilih dari Galeri
+                </button>
+              </div>
+              <input type="file" id="input-foto-circle" accept="image/*" capture="environment" class="hidden">
+              <div id="photo-circle-preview" class="mb-3 hidden">
+                <div class="relative inline-block">
+                  <img id="photo-circle-img" class="max-h-48 rounded-xl shadow-md">
+                  <button type="button" onclick="clearPhoto('circle')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </div>
+              </div>
+              <p class="text-xs text-slate-500 mt-2">💡 Klik tombol kamera untuk foto langsung, atau galeri untuk pilih dari penyimpanan</p>
+            </div>
+
+            <!-- Problem Sharing Section -->
+            <div class="border-t pt-6">
+              <div class="flex items-center justify-between mb-4"><h3 class="text-md font-bold text-slate-800 flex items-center gap-2"><span class="text-amber-500">⚠️</span> Problem Sharing (Opsional)</h3><button type="button" onclick="toggleProblemSection()" id="btn-toggle-problem" class="text-blue-600 text-sm font-semibold hover:text-blue-700">+ Tambah Problem</button></div>
+              <div id="problem-section" class="hidden space-y-4 bg-amber-50 p-4 rounded-xl">
+                <div><label class="block text-sm font-medium text-slate-700 mb-2">Problem</label><textarea id="input-problem" rows="2" placeholder="Jelaskan problem yang terjadi..." class="input-styled w-full px-4 py-3 rounded-xl outline-none"></textarea></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-2">Solusi</label><textarea id="input-solusi" rows="2" placeholder="Jelaskan solusi yang dilakukan..." class="input-styled w-full px-4 py-3 rounded-xl outline-none"></textarea></div>
+                
+                <!-- Foto Problem dengan opsi kamera/galeri -->
+                <div class="border border-amber-200 rounded-lg p-3">
+                  <label class="block text-sm font-medium text-slate-700 mb-2">📸 Foto Problem</label>
+                  <div class="flex flex-wrap gap-2 mb-2">
+                    <button type="button" onclick="openCamera('problem')" class="camera-button text-xs bg-white border border-amber-500 text-amber-600 py-2 px-3 rounded-lg flex items-center gap-1 hover:bg-amber-500 hover:text-white">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg> Kamera
+                    </button>
+                    <button type="button" onclick="openGallery('problem')" class="camera-button text-xs bg-white border border-slate-500 text-slate-600 py-2 px-3 rounded-lg flex items-center gap-1 hover:bg-slate-500 hover:text-white">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> Galeri
+                    </button>
+                  </div>
+                  <input type="file" id="input-foto-problem" accept="image/*" capture="environment" class="hidden">
+                  <div id="photo-problem-preview" class="mb-2 hidden">
+                    <div class="relative inline-block">
+                      <img id="photo-problem-img" class="max-h-32 rounded-xl shadow-md">
+                      <button type="button" onclick="clearPhoto('problem')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Improvement Section -->
+            <div class="border-t pt-6">
+              <div class="flex items-center justify-between mb-4"><h3 class="text-md font-bold text-slate-800 flex items-center gap-2"><span class="text-green-500">💡</span> Improvement (Opsional)</h3><button type="button" onclick="toggleImprovementSection()" id="btn-toggle-improvement" class="text-blue-600 text-sm font-semibold hover:text-blue-700">+ Tambah Improvement</button></div>
+              <div id="improvement-section" class="hidden space-y-4 bg-green-50 p-4 rounded-xl">
+                <div><label class="block text-sm font-medium text-slate-700 mb-2">PIC</label><input type="text" id="input-pic" placeholder="Nama PIC improvement" class="input-styled w-full px-4 py-3 rounded-xl outline-none"></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-2">Detail Improvement</label><textarea id="input-improvement-detail" rows="2" placeholder="Jelaskan detail improvement..." class="input-styled w-full px-4 py-3 rounded-xl outline-none"></textarea></div>
+                
+                <!-- Foto Improvement dengan opsi kamera/galeri -->
+                <div class="border border-green-200 rounded-lg p-3">
+                  <label class="block text-sm font-medium text-slate-700 mb-2">📸 Foto Improvement</label>
+                  <div class="flex flex-wrap gap-2 mb-2">
+                    <button type="button" onclick="openCamera('improvement')" class="camera-button text-xs bg-white border border-green-500 text-green-600 py-2 px-3 rounded-lg flex items-center gap-1 hover:bg-green-500 hover:text-white">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg> Kamera
+                    </button>
+                    <button type="button" onclick="openGallery('improvement')" class="camera-button text-xs bg-white border border-slate-500 text-slate-600 py-2 px-3 rounded-lg flex items-center gap-1 hover:bg-slate-500 hover:text-white">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> Galeri
+                    </button>
+                  </div>
+                  <input type="file" id="input-foto-improvement" accept="image/*" capture="environment" class="hidden">
+                  <div id="photo-improvement-preview" class="mb-2 hidden">
+                    <div class="relative inline-block">
+                      <img id="photo-improvement-img" class="max-h-32 rounded-xl shadow-md">
+                      <button type="button" onclick="clearPhoto('improvement')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4"><button type="submit" id="btn-submit-circle" class="btn-primary w-full text-white py-4 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Simpan Sesi Circle</button></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Manage Circle Tab -->
+      <div id="content-manage" class="hidden space-y-6 fade-in">
+        <!-- Admin Login -->
+        <div id="admin-login-section" class="card-gradient rounded-2xl shadow-lg p-6">
+          <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg> 🔐 Admin Login</h2>
+          <div class="flex gap-3"><input type="password" id="admin-password" placeholder="Masukkan password admin" class="input-styled flex-1 px-4 py-3 rounded-xl outline-none"><button onclick="adminLogin()" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold">Login</button></div>
+          <p class="text-slate-400 text-xs mt-2">💡 Hubungi Admin (pass: admin123)</p>
+        </div>
+
+        <!-- Admin Panel (Hidden by default) -->
+        <div id="admin-panel" class="hidden space-y-6">
+          <!-- Add Personil -->
+          <div class="card-gradient rounded-2xl shadow-lg p-6">
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg> Tambah Personil Baru</h2>
+            <div class="flex flex-col md:flex-row gap-3"><input type="text" id="new-personil-name" placeholder="Nama personil" class="input-styled flex-1 px-4 py-3 rounded-xl outline-none"><select id="new-personil-area" class="input-styled px-4 py-3 rounded-xl outline-none"><option value="Injeksi">Injeksi</option><option value="Non Injeksi">Non Injeksi</option></select><button onclick="addPersonil()" class="btn-success text-white px-6 py-3 rounded-xl font-semibold whitespace-nowrap">➕ Tambah</button></div>
+          </div>
+
+          <!-- Personil List -->
+          <div class="card-gradient rounded-2xl shadow-lg p-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3">
+              <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2"><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg> Daftar Personil</h2>
+              <div class="flex gap-2"><button onclick="filterPersonil('semua')" class="filter-btn filter-active px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-100 text-blue-700" data-filter="semua">Semua</button><button onclick="filterPersonil('injeksi')" class="filter-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200" data-filter="injeksi">Injeksi</button><button onclick="filterPersonil('non-injeksi')" class="filter-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200" data-filter="non-injeksi">Non Injeksi</button></div>
+            </div>
+            <div id="personil-list" class="space-y-2"><div class="text-center py-8 text-slate-400">Belum ada personil</div></div>
+          </div>
+
+          <!-- Logout -->
+          <button onclick="adminLogout()" class="text-slate-500 hover:text-slate-700 text-sm font-medium">🚪 Logout Admin</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Photo Modal -->
+    <div id="photo-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this) closePhotoModal()">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-4xl max-h-[90%] overflow-hidden">
+        <div class="flex items-center justify-between p-4 border-b"><h3 id="modal-title" class="font-bold text-slate-800">Foto</h3><button onclick="closePhotoModal()" class="text-slate-400 hover:text-slate-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+        <div class="p-4 overflow-auto"><img id="modal-photo" class="max-w-full max-h-[70vh] mx-auto rounded-lg"></div>
+      </div>
     </div>
-   </header><!-- Navigation Tabs -->
-   <nav class="bg-white shadow-md sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4">
-     <div class="flex gap-2 py-3 overflow-x-auto"><button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-active px-5 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition-all duration-300 flex items-center gap-2">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-       </svg> Dashboard </button> <button onclick="switchTab('input')" id="tab-input" class="px-5 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-300 flex items-center gap-2">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-       </svg> Input Circle </button> <button onclick="switchTab('manage')" id="tab-manage" class="px-5 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-300 flex items-center gap-2">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-       </svg> Kelola Circle </button>
-     </div>
-    </div>
-   </nav><!-- Main Content -->
-   <main class="max-w-7xl mx-auto px-4 py-6"><!-- Dashboard Tab -->
-    <div id="content-dashboard" class="space-y-6 fade-in"><!-- Stats Cards -->
-     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="stat-card border-l-blue-500 rounded-xl p-4 shadow-sm">
-       <div class="text-2xl font-bold text-blue-600" id="stat-total-sesi">
-        0
-       </div>
-       <div class="text-slate-500 text-sm">
-        Total Sesi Circle
-       </div>
-      </div>
-      <div class="stat-card border-l-green-500 rounded-xl p-4 shadow-sm">
-       <div class="text-2xl font-bold text-green-600" id="stat-total-personil">
-        0
-       </div>
-       <div class="text-slate-500 text-sm">
-        Total Personil
-       </div>
-      </div>
-      <div class="stat-card border-l-amber-500 rounded-xl p-4 shadow-sm">
-       <div class="text-2xl font-bold text-amber-600" id="stat-total-problem">
-        0
-       </div>
-       <div class="text-slate-500 text-sm">
-        Problem Sharing
-       </div>
-      </div>
-      <div class="stat-card border-l-purple-500 rounded-xl p-4 shadow-sm">
-       <div class="text-2xl font-bold text-purple-600" id="stat-total-improvement">
-        0
-       </div>
-       <div class="text-slate-500 text-sm">
-        Improvement
-       </div>
-      </div>
-     </div><!-- Attendance Chart -->
-     <div class="card-gradient rounded-2xl shadow-lg p-6">
-      <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-       <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-       </svg> Chart Kehadiran Personil</h2>
-      <div class="h-64 md:h-80">
-       <canvas id="attendance-chart"></canvas>
-      </div>
-     </div><!-- Session List -->
-     <div class="card-gradient rounded-2xl shadow-lg p-6">
-      <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-       <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-       </svg> List Sesi Circle</h2>
-      <div id="session-list" class="space-y-4">
-       <div class="text-center py-8 text-slate-400">
-        <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-        </svg> Belum ada data sesi circle
-       </div>
-      </div>
-     </div><!-- Problem Sharing List -->
-     <div class="card-gradient rounded-2xl shadow-lg p-6">
-      <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-       <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-       </svg> List Problem Sharing</h2>
-      <div id="problem-list" class="space-y-3">
-       <div class="text-center py-8 text-slate-400">
-        <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg> Belum ada problem sharing
-       </div>
-      </div>
-     </div><!-- Improvement List -->
-     <div class="card-gradient rounded-2xl shadow-lg p-6">
-      <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-       <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-       </svg> List Improvement</h2>
-      <div id="improvement-list" class="space-y-3">
-       <div class="text-center py-8 text-slate-400">
-        <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg> Belum ada improvement
-       </div>
-      </div>
-     </div>
-    </div><!-- Input Circle Tab -->
-    <div id="content-input" class="hidden space-y-6 fade-in">
-     <div class="card-gradient rounded-2xl shadow-lg p-6">
-      <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-       <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-       </svg> Input Sesi Circle Baru</h2>
-      <form id="circle-form" class="space-y-6"><!-- Date & Shift -->
-       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div><label class="block text-sm font-semibold text-slate-700 mb-2">📅 Tanggal</label> <input type="date" id="input-tanggal" required class="input-styled w-full px-4 py-3 rounded-xl outline-none">
-        </div>
-        <div><label class="block text-sm font-semibold text-slate-700 mb-2">⏰ Shift</label> <select id="input-shift" required class="input-styled w-full px-4 py-3 rounded-xl outline-none"> <option value="">Pilih Shift</option> <option value="Shift 1">Shift 1</option> <option value="Shift 2">Shift 2</option> <option value="Shift 3">Shift 3</option> <option value="Longshift Pagi">Longshift Pagi</option> <option value="Longshift Malam">Longshift Malam</option> </select>
-        </div>
-       </div><!-- Personil Checklist -->
-       <div><label class="block text-sm font-semibold text-slate-700 mb-2">👥 Personil Hadir</label>
-        <div id="personil-checklist" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 bg-slate-50 rounded-xl">
-         <div class="text-slate-400 text-sm col-span-full text-center py-4">
-          Belum ada personil. Tambahkan di menu Kelola Circle.
-         </div>
-        </div>
-       </div><!-- Teknik & QA -->
-       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-slate-50 p-4 rounded-xl"><label class="block text-sm font-semibold text-slate-700 mb-3">👷 Kehadiran Teknik</label>
-         <div class="flex items-center gap-4 mb-3"><label class="flex items-center gap-2 cursor-pointer"> <input type="radio" name="teknik-hadir" value="ya" class="w-4 h-4 text-blue-600"> <span class="text-sm">Ya</span> </label> <label class="flex items-center gap-2 cursor-pointer"> <input type="radio" name="teknik-hadir" value="tidak" checked class="w-4 h-4 text-blue-600"> <span class="text-sm">Tidak</span> </label>
-         </div><input type="text" id="input-teknik-inisial" placeholder="Inisial Teknik" class="input-styled w-full px-3 py-2 rounded-lg text-sm outline-none" disabled>
-        </div>
-        <div class="bg-slate-50 p-4 rounded-xl"><label class="block text-sm font-semibold text-slate-700 mb-3">🔍 Kehadiran QA</label>
-         <div class="flex items-center gap-4 mb-3"><label class="flex items-center gap-2 cursor-pointer"> <input type="radio" name="qa-hadir" value="ya" class="w-4 h-4 text-blue-600"> <span class="text-sm">Ya</span> </label> <label class="flex items-center gap-2 cursor-pointer"> <input type="radio" name="qa-hadir" value="tidak" checked class="w-4 h-4 text-blue-600"> <span class="text-sm">Tidak</span> </label>
-         </div><input type="text" id="input-qa-inisial" placeholder="Inisial QA" class="input-styled w-full px-3 py-2 rounded-lg text-sm outline-none" disabled>
-        </div>
-       </div><!-- SPV -->
-       <div><label class="block text-sm font-semibold text-slate-700 mb-2">👔 Inisial SPV Prod</label> <input type="text" id="input-spv" required placeholder="Masukkan inisial SPV" class="input-styled w-full px-4 py-3 rounded-xl outline-none">
-       </div><!-- Photo Circle -->
-       <div><label class="block text-sm font-semibold text-slate-700 mb-2">📸 Foto Circle <span class="text-red-500">*</span></label>
-        <div id="photo-circle-preview" class="mb-3 hidden"><img id="photo-circle-img" class="max-h-48 rounded-xl shadow-md">
-        </div><input type="file" id="input-foto-circle" accept="image/*" required class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-       </div><!-- Problem Sharing Section -->
-       <div class="border-t pt-6">
-        <div class="flex items-center justify-between mb-4">
-         <h3 class="text-md font-bold text-slate-800 flex items-center gap-2"><span class="text-amber-500">⚠️</span> Problem Sharing (Opsional)</h3><button type="button" onclick="toggleProblemSection()" id="btn-toggle-problem" class="text-blue-600 text-sm font-semibold hover:text-blue-700"> + Tambah Problem </button>
-        </div>
-        <div id="problem-section" class="hidden space-y-4 bg-amber-50 p-4 rounded-xl">
-         <div><label class="block text-sm font-medium text-slate-700 mb-2">Problem</label> <textarea id="input-problem" rows="2" placeholder="Jelaskan problem yang terjadi..." class="input-styled w-full px-4 py-3 rounded-xl outline-none"></textarea>
-         </div>
-         <div><label class="block text-sm font-medium text-slate-700 mb-2">Solusi</label> <textarea id="input-solusi" rows="2" placeholder="Jelaskan solusi yang dilakukan..." class="input-styled w-full px-4 py-3 rounded-xl outline-none"></textarea>
-         </div>
-         <div><label class="block text-sm font-medium text-slate-700 mb-2">📸 Foto Problem</label>
-          <div id="photo-problem-preview" class="mb-3 hidden"><img id="photo-problem-img" class="max-h-32 rounded-xl shadow-md">
-          </div><input type="file" id="input-foto-problem" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
-         </div>
-        </div>
-       </div><!-- Improvement Section -->
-       <div class="border-t pt-6">
-        <div class="flex items-center justify-between mb-4">
-         <h3 class="text-md font-bold text-slate-800 flex items-center gap-2"><span class="text-green-500">💡</span> Improvement (Opsional)</h3><button type="button" onclick="toggleImprovementSection()" id="btn-toggle-improvement" class="text-blue-600 text-sm font-semibold hover:text-blue-700"> + Tambah Improvement </button>
-        </div>
-        <div id="improvement-section" class="hidden space-y-4 bg-green-50 p-4 rounded-xl">
-         <div><label class="block text-sm font-medium text-slate-700 mb-2">PIC</label> <input type="text" id="input-pic" placeholder="Nama PIC improvement" class="input-styled w-full px-4 py-3 rounded-xl outline-none">
-         </div>
-         <div><label class="block text-sm font-medium text-slate-700 mb-2">Detail Improvement</label> <textarea id="input-improvement-detail" rows="2" placeholder="Jelaskan detail improvement..." class="input-styled w-full px-4 py-3 rounded-xl outline-none"></textarea>
-         </div>
-         <div><label class="block text-sm font-medium text-slate-700 mb-2">📸 Foto Improvement</label>
-          <div id="photo-improvement-preview" class="mb-3 hidden"><img id="photo-improvement-img" class="max-h-32 rounded-xl shadow-md">
-          </div><input type="file" id="input-foto-improvement" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
-         </div>
-        </div>
-       </div><!-- Submit Button -->
-       <div class="pt-4"><button type="submit" id="btn-submit-circle" class="btn-primary w-full text-white py-4 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2">
-         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-         </svg> Simpan Sesi Circle </button>
-       </div>
-      </form>
-     </div>
-    </div><!-- Manage Circle Tab -->
-    <div id="content-manage" class="hidden space-y-6 fade-in"><!-- Admin Login -->
-     <div id="admin-login-section" class="card-gradient rounded-2xl shadow-lg p-6">
-      <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-       <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-       </svg> 🔐 Admin Login</h2>
-      <div class="flex gap-3"><input type="password" id="admin-password" placeholder="Masukkan password admin" class="input-styled flex-1 px-4 py-3 rounded-xl outline-none"> <button onclick="adminLogin()" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold"> Login </button>
-      </div>
-      <p class="text-slate-400 text-xs mt-2">💡 Hubungi Admin</p>
-     </div><!-- Admin Panel (Hidden by default) -->
-     <div id="admin-panel" class="hidden space-y-6"><!-- Add Personil -->
-      <div class="card-gradient rounded-2xl shadow-lg p-6">
-       <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-        </svg> Tambah Personil Baru</h2>
-       <div class="flex flex-col md:flex-row gap-3"><input type="text" id="new-personil-name" placeholder="Nama personil" class="input-styled flex-1 px-4 py-3 rounded-xl outline-none"> <select id="new-personil-area" class="input-styled px-4 py-3 rounded-xl outline-none"> <option value="Injeksi">Injeksi</option> <option value="Non Injeksi">Non Injeksi</option> </select> <button onclick="addPersonil()" class="btn-success text-white px-6 py-3 rounded-xl font-semibold whitespace-nowrap"> ➕ Tambah </button>
-       </div>
-      </div><!-- Personil List -->
-      <div class="card-gradient rounded-2xl shadow-lg p-6">
-       <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3">
-        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-         </svg> Daftar Personil</h2>
-        <div class="flex gap-2"><button onclick="filterPersonil('semua')" class="filter-btn filter-active px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-100 text-blue-700" data-filter="semua">Semua</button> <button onclick="filterPersonil('injeksi')" class="filter-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200" data-filter="injeksi">Injeksi</button> <button onclick="filterPersonil('non-injeksi')" class="filter-btn px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200" data-filter="non-injeksi">Non Injeksi</button>
-        </div>
-       </div>
-       <div id="personil-list" class="space-y-2">
-        <div class="text-center py-8 text-slate-400">
-         Belum ada personil
-        </div>
-       </div>
-      </div><!-- Logout --> <button onclick="adminLogout()" class="text-slate-500 hover:text-slate-700 text-sm font-medium"> 🚪 Logout Admin </button>
-     </div>
-    </div>
-   </main><!-- Photo Modal -->
-   <div id="photo-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl max-h-[90%] overflow-hidden">
-     <div class="flex items-center justify-between p-4 border-b">
-      <h3 id="modal-title" class="font-bold text-slate-800">Foto</h3><button onclick="closePhotoModal()" class="text-slate-400 hover:text-slate-600">
-       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-       </svg></button>
-     </div>
-     <div class="p-4 overflow-auto"><img id="modal-photo" class="max-w-full max-h-[70vh] mx-auto rounded-lg">
-     </div>
-    </div>
-   </div><!-- Toast Container -->
-   <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
   </div>
+
   <script>
-    // ========== Supabase Configuration (EDIT INI) ==========
+    // ========== Supabase Configuration ==========
     const SUPABASE_URL = 'https://qohalhhmrzerztmxfymb.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvaGFsaGhtcnplcnp0bXhmeW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyODQyNTYsImV4cCI6MjA4Mzg2MDI1Nn0.9Ih6qFl1wXnsgc7i7js6NNuKyBA6pH1yM4TFQsfEp0o';
     
     // ========== Configuration ==========
-    const defaultConfig = {
-      app_title: 'Circle Monitoring PT. GOF',
-      company_name: 'created by MSTD GOF'
-    };
-
+    const defaultConfig = { app_title: 'Circle Monitoring PT. GOF', company_name: 'created by MSTD GOF' };
     let config = { ...defaultConfig };
     let supabaseDb = null;
+    let supabaseStorage = null;
     let isConnected = false;
     let attendanceChart = null;
 
     // Data stores
     let personilList = [];
     let sesiList = [];
-    let problemList = [];
-    let improvementList = [];
-
-    // Current filter
     let currentFilter = 'semua';
+    let deleteConfirmId = null;
+    let currentPhotoType = null;
 
     // ========== Element SDK Integration ==========
     async function initElementSdk() {
@@ -378,22 +319,14 @@
             config = { ...defaultConfig, ...newConfig };
             updateUI();
           },
-          mapToCapabilities: (cfg) => ({
-            recolorables: [],
-            borderables: [],
-            fontEditable: undefined,
-            fontSizeable: undefined
-          }),
-          mapToEditPanelValues: (cfg) => new Map([
-            ['app_title', cfg.app_title || defaultConfig.app_title],
-            ['company_name', cfg.company_name || defaultConfig.company_name]
-          ])
+          mapToCapabilities: (cfg) => ({ recolorables: [], borderables: [], fontEditable: undefined, fontSizeable: undefined }),
+          mapToEditPanelValues: (cfg) => new Map([ ['app_title', cfg.app_title || defaultConfig.app_title], ['company_name', cfg.company_name || defaultConfig.company_name] ])
         });
         config = { ...defaultConfig, ...window.elementSdk.config };
       }
       updateUI();
     }
-
+    
     function updateUI() {
       document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
       document.getElementById('company-name').textContent = config.company_name || defaultConfig.company_name;
@@ -403,98 +336,114 @@
     async function connectSupabase() {
       if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.includes('YOUR_PROJECT_ID') || SUPABASE_ANON_KEY.includes('YOUR_ANON_KEY')) {
         isConnected = false;
-        document.getElementById('connection-status').innerHTML = `
-          <span class="w-2 h-2 rounded-full bg-red-400"></span>
-          <span class="text-sm">Not Configured</span>
-        `;
+        document.getElementById('connection-status').innerHTML = '<span class="w-2 h-2 rounded-full bg-red-400"></span><span class="text-sm">Not Configured</span>';
         showToast('⚠️ Edit SUPABASE_URL dan SUPABASE_ANON_KEY di code', 'error');
         return;
       }
-
       try {
         supabaseDb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseStorage = supabaseDb.storage;
         
-        // Test connection
-        const { data, error } = await supabaseDb.from('personil').select('*');
-        
+        // ✅ PAKE TABEL _new
+        const { data, error } = await supabaseDb.from('personil_new').select('*');
         if (error) throw error;
-
+        
         isConnected = true;
-        document.getElementById('connection-status').innerHTML = `
-          <span class="w-2 h-2 rounded-full bg-green-400"></span>
-          <span>Connected</span>
-        `;
-        
+        document.getElementById('connection-status').innerHTML = '<span class="w-2 h-2 rounded-full bg-green-400"></span><span>Connected</span>';
         showToast('✅ Terhubung ke Supabase!', 'success');
-        
-        // Load all data
         await loadAllData();
       } catch (error) {
         console.error('Connection error:', error);
         isConnected = false;
-        document.getElementById('connection-status').innerHTML = `
-          <span class="w-2 h-2 rounded-full bg-red-400"></span>
-          <span class="text-sm">Error</span>
-        `;
+        document.getElementById('connection-status').innerHTML = '<span class="w-2 h-2 rounded-full bg-red-400"></span><span class="text-sm">Error</span>';
         showToast('❌ Gagal terhubung: ' + error.message, 'error');
       }
     }
 
-    // Auto-connect on load
-    async function autoConnect() {
-      await connectSupabase();
-    }
-
-    // ========== Data Loading ==========
-    async function loadAllData() {
-      if (!isConnected) return;
-
+    // ========== Storage Functions ==========
+    async function uploadPhoto(file, folder, fileName) {
+      if (!file) return null;
+      
       try {
-        // Load personil
-        const { data: personil } = await supabaseDb.from('personil').select('*').order('nama');
-        personilList = personil || [];
-
-        // Load sesi
-        const { data: sesi } = await supabaseDb.from('sesi_circle').select('*').order('tanggal', { ascending: false });
-        sesiList = sesi || [];
-
-        // Load problems
-        const { data: problems } = await supabaseDb.from('problem_sharing').select('*').order('created_at', { ascending: false });
-        problemList = problems || [];
-
-        // Load improvements
-        const { data: improvements } = await supabaseDb.from('improvement').select('*').order('created_at', { ascending: false });
-        improvementList = improvements || [];
-
-        // Update all UIs
-        renderPersonilChecklist();
-        renderPersonilList();
-        renderSessionList();
-        renderProblemList();
-        renderImprovementList();
-        updateStats();
-        updateAttendanceChart();
+        const ext = file.name.split('.').pop();
+        const uniqueName = `${folder}/${fileName}_${Date.now()}.${ext}`;
+        
+        const { data, error } = await supabaseStorage
+          .from('circle-photos')
+          .upload(uniqueName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+        
+        if (error) throw error;
+        
+        const { data: { publicUrl } } = supabaseStorage
+          .from('circle-photos')
+          .getPublicUrl(uniqueName);
+        
+        return publicUrl;
       } catch (error) {
-        console.error('Load data error:', error);
-        showToast('Gagal memuat data', 'error');
+        console.error('Upload error:', error);
+        showToast('Gagal upload foto: ' + error.message, 'error');
+        return null;
       }
     }
 
+    // ========== Camera & Gallery Functions ==========
+    window.openCamera = function(type) {
+      currentPhotoType = type;
+      const input = document.getElementById(`input-foto-${type}`);
+      input.setAttribute('capture', 'environment');
+      input.click();
+    }
+
+    window.openGallery = function(type) {
+      currentPhotoType = type;
+      const input = document.getElementById(`input-foto-${type}`);
+      input.removeAttribute('capture');
+      input.click();
+    }
+
+    window.clearPhoto = function(type) {
+      const previewDiv = document.getElementById(`photo-${type}-preview`);
+      const imgElement = document.getElementById(`photo-${type}-img`);
+      const input = document.getElementById(`input-foto-${type}`);
+      
+      input.value = '';
+      previewDiv.classList.add('hidden');
+      imgElement.src = '';
+    }
+
+    // Setup photo preview
+    function setupPhotoPreview(type) {
+      const input = document.getElementById(`input-foto-${type}`);
+      const previewId = `photo-${type}-preview`;
+      const imgId = `photo-${type}-img`;
+
+      input.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            document.getElementById(imgId).src = ev.target.result;
+            document.getElementById(previewId).classList.remove('hidden');
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    // Setup preview untuk semua tipe foto
+    ['circle', 'problem', 'improvement'].forEach(type => setupPhotoPreview(type));
+
     // ========== Tab Navigation ==========
     window.switchTab = function(tab) {
-      // Hide all content
       document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
-      
-      // Reset all tabs
-      document.querySelectorAll('[id^="tab-"]').forEach(el => {
-        el.classList.remove('tab-active');
-        el.classList.add('bg-slate-100', 'text-slate-600');
+      document.querySelectorAll('[id^="tab-"]').forEach(el => { 
+        el.classList.remove('tab-active'); 
+        el.classList.add('bg-slate-100', 'text-slate-600'); 
       });
-
-      // Show selected content
       document.getElementById(`content-${tab}`).classList.remove('hidden');
-      
-      // Activate selected tab
       const activeTab = document.getElementById(`tab-${tab}`);
       activeTab.classList.add('tab-active');
       activeTab.classList.remove('bg-slate-100', 'text-slate-600');
@@ -502,210 +451,110 @@
 
     // ========== Personil Management ==========
     window.addPersonil = async function() {
-      if (!isConnected) {
-        showToast('Hubungkan ke Supabase terlebih dahulu', 'error');
-        return;
-      }
-
+      if (!isConnected) { showToast('Hubungkan ke Supabase terlebih dahulu', 'error'); return; }
       const nama = document.getElementById('new-personil-name').value.trim();
       const area = document.getElementById('new-personil-area').value;
-
-      if (!nama) {
-        showToast('Nama personil tidak boleh kosong', 'error');
-        return;
-      }
-
+      if (!nama) { showToast('Nama personil tidak boleh kosong', 'error'); return; }
       try {
-        const { error } = await supabaseDb.from('personil').insert({ nama, area });
+        // ✅ PAKE personil_new
+        const { error } = await supabaseDb.from('personil_new').insert({ nama, area });
         if (error) throw error;
-
         document.getElementById('new-personil-name').value = '';
         showToast('Personil berhasil ditambahkan', 'success');
         await loadAllData();
-      } catch (error) {
-        showToast('Gagal menambah personil: ' + error.message, 'error');
-      }
+      } catch (error) { showToast('Gagal menambah personil: ' + error.message, 'error'); }
     }
 
-    async function deletePersonil(id) {
-      if (!isConnected) return;
-
-      try {
-        const { error } = await supabaseDb.from('personil').delete().eq('id', id);
-        if (error) throw error;
-
-        showToast('Personil berhasil dihapus', 'success');
-        await loadAllData();
-      } catch (error) {
-        showToast('Gagal menghapus personil: ' + error.message, 'error');
-      }
+    async function deletePersonil(id) { 
+      if (!isConnected) return; 
+      try { 
+        // ✅ PAKE personil_new
+        await supabaseDb.from('personil_new').delete().eq('id', id); 
+        showToast('Personil dihapus', 'success'); 
+        await loadAllData(); 
+      } catch (error) { showToast('Gagal hapus', 'error'); } 
     }
 
     window.filterPersonil = function(filter) {
       currentFilter = filter;
-      
-      // Update filter buttons
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('filter-active', 'bg-blue-100', 'text-blue-700');
-        btn.classList.add('bg-slate-100', 'text-slate-600');
+      document.querySelectorAll('.filter-btn').forEach(btn => { 
+        btn.classList.remove('filter-active', 'bg-blue-100', 'text-blue-700'); 
+        btn.classList.add('bg-slate-100', 'text-slate-600'); 
       });
-      
       const activeBtn = document.querySelector(`[data-filter="${filter}"]`);
       activeBtn.classList.remove('bg-slate-100', 'text-slate-600');
       activeBtn.classList.add('filter-active', 'bg-blue-100', 'text-blue-700');
-
       renderPersonilList();
     }
 
     function renderPersonilList() {
       const container = document.getElementById('personil-list');
-      
       let filtered = personilList;
-      if (currentFilter === 'injeksi') {
-        filtered = personilList.filter(p => p.area === 'Injeksi');
-      } else if (currentFilter === 'non-injeksi') {
-        filtered = personilList.filter(p => p.area === 'Non Injeksi');
-      }
-
-      if (filtered.length === 0) {
-        container.innerHTML = '<div class="text-center py-8 text-slate-400">Belum ada personil</div>';
-        return;
-      }
-
-      container.innerHTML = filtered.map(p => `
-        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold">
-              ${p.nama.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <div class="font-semibold text-slate-800">${p.nama}</div>
-              <div class="text-xs text-slate-500">${p.area}</div>
-            </div>
-          </div>
-          <button onclick="confirmDeletePersonil(${p.id}, '${p.nama}')" class="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-          </button>
-        </div>
-      `).join('');
+      if (currentFilter === 'injeksi') filtered = personilList.filter(p => p.area === 'Injeksi');
+      else if (currentFilter === 'non-injeksi') filtered = personilList.filter(p => p.area === 'Non Injeksi');
+      if (filtered.length === 0) { container.innerHTML = '<div class="text-center py-8 text-slate-400">Belum ada personil</div>'; return; }
+      container.innerHTML = filtered.map(p => `<div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+          <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold">${p.nama.charAt(0).toUpperCase()}</div><div><div class="font-semibold text-slate-800">${p.nama}</div><div class="text-xs text-slate-500">${p.area}</div></div></div>
+          <button onclick="confirmDeletePersonil(${p.id}, '${p.nama}')" class="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div>`).join('');
     }
 
-    let deleteConfirmId = null;
     window.confirmDeletePersonil = function(id, nama) {
-      const container = document.getElementById('personil-list');
-      const item = container.querySelector(`button[onclick="confirmDeletePersonil(${id}, '${nama}')"]`).closest('div.flex');
-      
-      if (deleteConfirmId === id) {
-        deletePersonil(id);
-        deleteConfirmId = null;
-        return;
-      }
-      
+      if (deleteConfirmId === id) { deletePersonil(id); deleteConfirmId = null; return; }
       deleteConfirmId = id;
-      const btn = item.querySelector('button');
+      const btn = document.querySelector(`button[onclick="confirmDeletePersonil(${id}, '${nama}')"]`);
       btn.innerHTML = '<span class="text-xs font-semibold">Konfirmasi?</span>';
       btn.classList.add('bg-red-100');
-      
-      setTimeout(() => {
-        if (deleteConfirmId === id) {
-          deleteConfirmId = null;
-          renderPersonilList();
-        }
-      }, 3000);
+      setTimeout(() => { if (deleteConfirmId === id) { deleteConfirmId = null; renderPersonilList(); } }, 3000);
     }
 
     function renderPersonilChecklist() {
       const container = document.getElementById('personil-checklist');
-      
-      if (personilList.length === 0) {
-        container.innerHTML = '<div class="text-slate-400 text-sm col-span-full text-center py-4">Belum ada personil. Tambahkan di menu Kelola Circle.</div>';
-        return;
-      }
-
-      container.innerHTML = personilList.map(p => `
-        <label class="flex items-center gap-2 p-2 bg-white rounded-lg hover:bg-blue-50 cursor-pointer transition-colors border border-slate-200">
-          <input type="checkbox" value="${p.nama}" class="personil-checkbox w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500">
-          <span class="text-sm font-medium text-slate-700">${p.nama}</span>
-          <span class="text-xs text-slate-400">(${p.area})</span>
-        </label>
-      `).join('');
+      if (personilList.length === 0) { container.innerHTML = '<div class="text-slate-400 text-sm col-span-full text-center py-4">Belum ada personil. Tambahkan di menu Kelola Circle.</div>'; return; }
+      container.innerHTML = personilList.map(p => `<label class="flex items-center gap-2 p-2 bg-white rounded-lg hover:bg-blue-50 cursor-pointer transition-colors border border-slate-200"><input type="checkbox" value="${p.nama}" class="personil-checkbox w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500"><span class="text-sm font-medium text-slate-700">${p.nama}</span><span class="text-xs text-slate-400">(${p.area})</span></label>`).join('');
     }
 
     // ========== Admin Login ==========
     window.adminLogin = function() {
-      const password = document.getElementById('admin-password').value;
-      if (password === 'admin123') {
+      if (document.getElementById('admin-password').value === 'admin123') {
         document.getElementById('admin-login-section').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
         showToast('Login admin berhasil', 'success');
-      } else {
-        showToast('Password salah', 'error');
-      }
+      } else showToast('Password salah', 'error');
+    }
+    
+    window.adminLogout = function() { 
+      document.getElementById('admin-login-section').classList.remove('hidden'); 
+      document.getElementById('admin-panel').classList.add('hidden'); 
+      document.getElementById('admin-password').value = ''; 
     }
 
-    window.adminLogout = function() {
-      document.getElementById('admin-login-section').classList.remove('hidden');
-      document.getElementById('admin-panel').classList.add('hidden');
-      document.getElementById('admin-password').value = '';
+    // ========== Form Helpers ==========
+    document.querySelectorAll('input[name="teknik-hadir"]').forEach(r => r.addEventListener('change', (e) => document.getElementById('input-teknik-inisial').disabled = e.target.value !== 'ya'));
+    document.querySelectorAll('input[name="qa-hadir"]').forEach(r => r.addEventListener('change', (e) => document.getElementById('input-qa-inisial').disabled = e.target.value !== 'ya'));
+
+    window.toggleProblemSection = function() { 
+      const s = document.getElementById('problem-section'); 
+      const b = document.getElementById('btn-toggle-problem'); 
+      s.classList.toggle('hidden'); 
+      b.textContent = s.classList.contains('hidden') ? '+ Tambah Problem' : '− Sembunyikan'; 
+    }
+    
+    window.toggleImprovementSection = function() { 
+      const s = document.getElementById('improvement-section'); 
+      const b = document.getElementById('btn-toggle-improvement'); 
+      s.classList.toggle('hidden'); 
+      b.textContent = s.classList.contains('hidden') ? '+ Tambah Improvement' : '− Sembunyikan'; 
     }
 
-    // ========== Circle Form ==========
-    document.querySelectorAll('input[name="teknik-hadir"]').forEach(radio => {
-      radio.addEventListener('change', (e) => {
-        document.getElementById('input-teknik-inisial').disabled = e.target.value !== 'ya';
-      });
-    });
-
-    document.querySelectorAll('input[name="qa-hadir"]').forEach(radio => {
-      radio.addEventListener('change', (e) => {
-        document.getElementById('input-qa-inisial').disabled = e.target.value !== 'ya';
-      });
-    });
-
-    // Photo previews
-    document.getElementById('input-foto-circle').addEventListener('change', (e) => previewPhoto(e, 'photo-circle-preview', 'photo-circle-img'));
-    document.getElementById('input-foto-problem').addEventListener('change', (e) => previewPhoto(e, 'photo-problem-preview', 'photo-problem-img'));
-    document.getElementById('input-foto-improvement').addEventListener('change', (e) => previewPhoto(e, 'photo-improvement-preview', 'photo-improvement-img'));
-
-    function previewPhoto(e, previewId, imgId) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          document.getElementById(imgId).src = ev.target.result;
-          document.getElementById(previewId).classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    window.toggleProblemSection = function() {
-      const section = document.getElementById('problem-section');
-      const btn = document.getElementById('btn-toggle-problem');
-      section.classList.toggle('hidden');
-      btn.textContent = section.classList.contains('hidden') ? '+ Tambah Problem' : '− Sembunyikan';
-    }
-
-    window.toggleImprovementSection = function() {
-      const section = document.getElementById('improvement-section');
-      const btn = document.getElementById('btn-toggle-improvement');
-      section.classList.toggle('hidden');
-      btn.textContent = section.classList.contains('hidden') ? '+ Tambah Improvement' : '− Sembunyikan';
-    }
-
-    // Form submission
+    // ========== Form Submission ==========
     document.getElementById('circle-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!isConnected) { showToast('Hubungkan ke Supabase terlebih dahulu', 'error'); return; }
       
-      if (!isConnected) {
-        showToast('Hubungkan ke Supabase terlebih dahulu', 'error');
-        return;
-      }
-
       const btn = document.getElementById('btn-submit-circle');
-      btn.disabled = true;
+      btn.disabled = true; 
       btn.innerHTML = '<div class="loading-spinner mx-auto"></div>';
-
+      
       try {
         const tanggal = document.getElementById('input-tanggal').value;
         const shift = document.getElementById('input-shift').value;
@@ -715,104 +564,274 @@
         const qaHadir = document.querySelector('input[name="qa-hadir"]:checked').value === 'ya';
         const qaInisial = document.getElementById('input-qa-inisial').value;
         const spvInisial = document.getElementById('input-spv').value;
+        
+        // Upload foto circle ke storage
+        const fotoCircleFile = document.getElementById('input-foto-circle').files[0];
+        const fotoCircle = fotoCircleFile ? await uploadPhoto(fotoCircleFile, 'circle', `sesi_${Date.now()}`) : null;
 
-        // Get photo as base64
-        const fotoCircle = await fileToBase64(document.getElementById('input-foto-circle').files[0]);
-
-        // Insert sesi
-        const { data: sesiData, error: sesiError } = await supabaseDb.from('sesi_circle').insert({
-          tanggal,
-          shift,
-          personil_hadir: personilHadir,
-          teknik_hadir: teknikHadir,
-          teknik_inisial: teknikInisial,
-          qa_hadir: qaHadir,
-          qa_inisial: qaInisial,
-          spv_inisial: spvInisial,
-          foto_circle: fotoCircle
-        }).select().single();
-
+        // ✅ PAKE sesi_circle_new
+        const { data: sesiData, error: sesiError } = await supabaseDb
+          .from('sesi_circle_new')
+          .insert({ 
+            tanggal, 
+            shift, 
+            personil_hadir: personilHadir, 
+            teknik_hadir: teknikHadir, 
+            teknik_inisial: teknikInisial, 
+            qa_hadir: qaHadir, 
+            qa_inisial: qaInisial, 
+            spv_inisial: spvInisial, 
+            foto_circle: fotoCircle 
+          })
+          .select()
+          .single();
+          
         if (sesiError) throw sesiError;
 
-        // Insert problem if exists
+        // Insert problem jika ada
         const problem = document.getElementById('input-problem').value;
         if (problem) {
-          const fotoProblem = document.getElementById('input-foto-problem').files[0] 
-            ? await fileToBase64(document.getElementById('input-foto-problem').files[0]) 
-            : null;
+          const fotoProblemFile = document.getElementById('input-foto-problem').files[0];
+          const fotoProblem = fotoProblemFile ? await uploadPhoto(fotoProblemFile, 'problem', `problem_${sesiData.id}`) : null;
           
-          await supabaseDb.from('problem_sharing').insert({
-            sesi_id: sesiData.id,
-            problem,
-            solusi: document.getElementById('input-solusi').value,
-            foto: fotoProblem
+          // ✅ PAKE problem_sharing_new
+          await supabaseDb.from('problem_sharing_new').insert({ 
+            sesi_id: sesiData.id, 
+            problem, 
+            solusi: document.getElementById('input-solusi').value, 
+            foto: fotoProblem 
           });
         }
 
-        // Insert improvement if exists
+        // Insert improvement jika ada
         const improvement = document.getElementById('input-improvement-detail').value;
         if (improvement) {
-          const fotoImprovement = document.getElementById('input-foto-improvement').files[0]
-            ? await fileToBase64(document.getElementById('input-foto-improvement').files[0])
-            : null;
-
-          await supabaseDb.from('improvement').insert({
-            sesi_id: sesiData.id,
-            pic: document.getElementById('input-pic').value,
-            detail: improvement,
-            foto: fotoImprovement
+          const fotoImprovementFile = document.getElementById('input-foto-improvement').files[0];
+          const fotoImprovement = fotoImprovementFile ? await uploadPhoto(fotoImprovementFile, 'improvement', `improvement_${sesiData.id}`) : null;
+          
+          // ✅ PAKE improvement_new
+          await supabaseDb.from('improvement_new').insert({ 
+            sesi_id: sesiData.id, 
+            pic: document.getElementById('input-pic').value, 
+            detail: improvement, 
+            foto: fotoImprovement 
           });
         }
 
         showToast('Sesi circle berhasil disimpan!', 'success');
-        document.getElementById('circle-form').reset();
-        document.getElementById('photo-circle-preview').classList.add('hidden');
-        document.getElementById('photo-problem-preview').classList.add('hidden');
-        document.getElementById('photo-improvement-preview').classList.add('hidden');
-        document.getElementById('problem-section').classList.add('hidden');
+        
+        // Reset form
+        document.getElementById('circle-form').reset(); 
+        document.getElementById('input-tanggal').valueAsDate = new Date();
+        
+        // Reset semua preview
+        ['circle', 'problem', 'improvement'].forEach(type => {
+          document.getElementById(`photo-${type}-preview`).classList.add('hidden');
+          document.getElementById(`input-foto-${type}`).value = '';
+        });
+        
+        document.getElementById('problem-section').classList.add('hidden'); 
         document.getElementById('improvement-section').classList.add('hidden');
-        document.getElementById('btn-toggle-problem').textContent = '+ Tambah Problem';
+        document.getElementById('btn-toggle-problem').textContent = '+ Tambah Problem'; 
         document.getElementById('btn-toggle-improvement').textContent = '+ Tambah Improvement';
-
-        await loadAllData();
+        
+        await loadAllData(); 
         switchTab('dashboard');
-      } catch (error) {
-        console.error('Submit error:', error);
-        showToast('Gagal menyimpan: ' + error.message, 'error');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-          Simpan Sesi Circle
-        `;
+        
+      } catch (error) { 
+        console.error('Submit error:', error); 
+        showToast('Gagal menyimpan: ' + error.message, 'error'); 
+      } finally { 
+        btn.disabled = false; 
+        btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Simpan Sesi Circle'; 
       }
     });
 
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        if (!file) {
-          resolve(null);
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+    // ========== LOAD ALL DATA (dengan relasi) ==========
+    async function loadAllData() {
+      if (!isConnected) return;
+      
+      try {
+        // ✅ PAKE personil_new
+        const { data: personil } = await supabaseDb.from('personil_new').select('*').order('nama');
+        personilList = personil || [];
+        
+        // ✅ PAKE sesi_circle_new dengan relasi ke *_new
+        const { data: sesi, error } = await supabaseDb
+          .from('sesi_circle_new')
+          .select(`
+            *,
+            problem_sharing_new (*),
+            improvement_new (*)
+          `)
+          .order('tanggal', { ascending: false });
+        
+        if (error) throw error;
+        
+        sesiList = sesi || [];
+        
+        // Update semua UI
+        renderPersonilChecklist();
+        renderPersonilList();
+        renderTimeline();
+        updateStats();
+        updateAttendanceChart();
+        
+      } catch (error) {
+        console.error('Load data error:', error);
+        showToast('Gagal memuat data: ' + error.message, 'error');
+      }
     }
 
-    // ========== Dashboard Rendering ==========
+    // ========== RENDER TIMELINE (GABUNGAN) ==========
+    function renderTimeline() {
+      const container = document.getElementById('timeline-list');
+      
+      if (sesiList.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 bg-white rounded-2xl shadow-sm">
+            <svg class="w-16 h-16 mx-auto text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-slate-400 mt-2">Belum ada sesi circle</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = sesiList.map(sesi => {
+        // Cek apakah ada problem & improvement
+        const hasProblem = sesi.problem_sharing_new && sesi.problem_sharing_new.length > 0;
+        const hasImprovement = sesi.improvement_new && sesi.improvement_new.length > 0;
+        
+        // Tentukan class card berdasarkan isinya
+        let cardClass = 'card-sesi bg-white rounded-2xl shadow-sm hover:shadow-md p-5 ';
+        if (hasProblem && hasImprovement) cardClass += 'has-both';
+        else if (hasProblem) cardClass += 'has-problem';
+        else if (hasImprovement) cardClass += 'has-improvement';
+        
+        return `
+          <div class="${cardClass}">
+            <!-- Header Sesi -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+              <div class="flex items-center gap-3 flex-wrap">
+                <span class="bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-sm font-bold">
+                  ${formatDate(sesi.tanggal)}
+                </span>
+                <span class="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-sm font-medium">
+                  ${sesi.shift}
+                </span>
+                ${hasProblem ? '<span class="badge-problem text-white px-3 py-1.5 rounded-full text-xs font-bold">⚠️ PROBLEM</span>' : ''}
+                ${hasImprovement ? '<span class="badge-improvement text-white px-3 py-1.5 rounded-full text-xs font-bold">💡 IMPROVEMENT</span>' : ''}
+              </div>
+              ${sesi.foto_circle ? `
+                <img src="${sesi.foto_circle}" class="photo-thumbnail w-16 h-16 object-cover rounded-xl shadow-md cursor-pointer" onclick="openPhotoModal('${sesi.foto_circle}', 'Foto Circle - ${formatDate(sesi.tanggal)}')" alt="Foto Circle">
+              ` : ''}
+            </div>
+
+            <!-- Detail Kehadiran -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 bg-slate-50 rounded-xl p-4">
+              <div>
+                <p class="text-xs text-slate-500 mb-1">👥 Personil Hadir</p>
+                <div class="flex flex-wrap gap-1">
+                  ${sesi.personil_hadir && sesi.personil_hadir.length > 0 
+                    ? sesi.personil_hadir.map(nama => 
+                        `<span class="bg-white px-2 py-1 rounded-lg text-xs shadow-sm">${nama}</span>`
+                      ).join('') 
+                    : '<span class="text-sm text-slate-400">-</span>'}
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <p class="text-xs text-slate-500">👷 Teknik</p>
+                  <p class="font-medium text-sm">${sesi.teknik_hadir ? `Ya (${sesi.teknik_inisial || ''})` : 'Tidak'}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-500">🔍 QA</p>
+                  <p class="font-medium text-sm">${sesi.qa_hadir ? `Ya (${sesi.qa_inisial || ''})` : 'Tidak'}</p>
+                </div>
+                <div class="col-span-2">
+                  <p class="text-xs text-slate-500">👔 SPV Prod</p>
+                  <p class="font-medium text-sm">${sesi.spv_inisial || '-'}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- PROBLEM SECTION (kalo ada) -->
+            ${hasProblem ? `
+              <div class="mb-3 bg-amber-50 rounded-xl p-4 border border-amber-200">
+                <p class="text-xs font-bold text-amber-800 mb-2 flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  PROBLEM SHARING
+                </p>
+                ${sesi.problem_sharing_new.map(p => `
+                  <div class="flex gap-3 ${p.foto ? 'items-start' : ''} mb-2 last:mb-0">
+                    <div class="flex-1">
+                      <p class="text-sm font-semibold text-amber-900">⚠️ ${p.problem}</p>
+                      ${p.solusi ? `
+                        <p class="text-sm text-slate-600 mt-1">
+                          <span class="font-medium text-green-600">✅ Solusi:</span> ${p.solusi}
+                        </p>
+                      ` : ''}
+                    </div>
+                    ${p.foto ? `
+                      <img src="${p.foto}" class="photo-thumbnail w-16 h-16 object-cover rounded-lg shadow-md cursor-pointer" onclick="openPhotoModal('${p.foto}', 'Foto Problem')" alt="Foto Problem">
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            <!-- IMPROVEMENT SECTION (kalo ada) -->
+            ${hasImprovement ? `
+              <div class="bg-green-50 rounded-xl p-4 border border-green-200">
+                <p class="text-xs font-bold text-green-800 mb-2 flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  IMPROVEMENT
+                </p>
+                ${sesi.improvement_new.map(i => `
+                  <div class="flex gap-3 ${i.foto ? 'items-start' : ''} mb-2 last:mb-0">
+                    <div class="flex-1">
+                      ${i.pic ? `<p class="text-xs text-green-700 mb-1">PIC: <span class="font-semibold">${i.pic}</span></p>` : ''}
+                      <p class="text-sm text-slate-700">${i.detail}</p>
+                    </div>
+                    ${i.foto ? `
+                      <img src="${i.foto}" class="photo-thumbnail w-16 h-16 object-cover rounded-lg shadow-md cursor-pointer" onclick="openPhotoModal('${i.foto}', 'Foto Improvement')" alt="Foto Improvement">
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ========== UPDATE STATS ==========
     function updateStats() {
       document.getElementById('stat-total-sesi').textContent = sesiList.length;
       document.getElementById('stat-total-personil').textContent = personilList.length;
-      document.getElementById('stat-total-problem').textContent = problemList.length;
-      document.getElementById('stat-total-improvement').textContent = improvementList.length;
+      
+      // Hitung total problem & improvement dari semua sesi
+      let totalProblem = 0;
+      let totalImprovement = 0;
+      
+      sesiList.forEach(sesi => {
+        totalProblem += sesi.problem_sharing_new?.length || 0;
+        totalImprovement += sesi.improvement_new?.length || 0;
+      });
+      
+      document.getElementById('stat-total-problem').textContent = totalProblem;
+      document.getElementById('stat-total-improvement').textContent = totalImprovement;
     }
 
+    // ========== UPDATE CHART ==========
     function updateAttendanceChart() {
       const ctx = document.getElementById('attendance-chart').getContext('2d');
-      
-      // Calculate attendance per personil
       const attendanceCount = {};
       personilList.forEach(p => attendanceCount[p.nama] = 0);
       
@@ -829,9 +848,7 @@
       const labels = Object.keys(attendanceCount);
       const data = Object.values(attendanceCount);
 
-      if (attendanceChart) {
-        attendanceChart.destroy();
-      }
+      if (attendanceChart) attendanceChart.destroy();
 
       attendanceChart = new Chart(ctx, {
         type: 'bar',
@@ -849,192 +866,53 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
+          plugins: { legend: { display: false } },
           scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                stepSize: 1
-              }
-            },
-            x: {
-              ticks: {
-                maxRotation: 45,
-                minRotation: 45
-              }
-            }
+            y: { beginAtZero: true, ticks: { stepSize: 1 } },
+            x: { ticks: { maxRotation: 45, minRotation: 45 } }
           }
         }
       });
     }
 
-    function renderSessionList() {
-      const container = document.getElementById('session-list');
-      
-      if (sesiList.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-8 text-slate-400">
-            <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-            Belum ada data sesi circle
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = sesiList.map(sesi => `
-        <div class="bg-slate-50 rounded-xl p-4 hover:bg-slate-100 transition-colors">
-          <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
-            <div class="flex-1">
-              <div class="flex items-center gap-3 mb-2">
-                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
-                  ${formatDate(sesi.tanggal)}
-                </span>
-                <span class="bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-sm font-medium">
-                  ${sesi.shift}
-                </span>
-              </div>
-              <div class="text-sm text-slate-600 space-y-1">
-                <div><strong>👥 Personil:</strong> ${sesi.personil_hadir ? sesi.personil_hadir.join(', ') : '-'}</div>
-                <div class="flex flex-wrap gap-4">
-                  <span><strong>👷 Teknik:</strong> ${sesi.teknik_hadir ? `Ya (${sesi.teknik_inisial})` : 'Tidak'}</span>
-                  <span><strong>🔍 QA:</strong> ${sesi.qa_hadir ? `Ya (${sesi.qa_inisial})` : 'Tidak'}</span>
-                  <span><strong>👔 SPV:</strong> ${sesi.spv_inisial || '-'}</span>
-                </div>
-              </div>
-            </div>
-            ${sesi.foto_circle ? `
-              <img src="${sesi.foto_circle}" class="photo-thumbnail w-24 h-24 object-cover rounded-xl shadow-md" onclick="openPhotoModal('${sesi.foto_circle}', 'Foto Circle - ${formatDate(sesi.tanggal)}')" alt="Foto Circle">
-            ` : ''}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderProblemList() {
-      const container = document.getElementById('problem-list');
-      
-      if (problemList.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-8 text-slate-400">
-            <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            Belum ada problem sharing
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = problemList.map(p => `
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <div class="flex flex-col md:flex-row md:items-start gap-4">
-            <div class="flex-1">
-              <div class="font-semibold text-amber-800 mb-1">⚠️ Problem</div>
-              <p class="text-slate-700 text-sm mb-2">${p.problem}</p>
-              ${p.solusi ? `
-                <div class="font-semibold text-green-700 mb-1">✅ Solusi</div>
-                <p class="text-slate-700 text-sm">${p.solusi}</p>
-              ` : ''}
-            </div>
-            ${p.foto ? `
-              <img src="${p.foto}" class="photo-thumbnail w-20 h-20 object-cover rounded-xl shadow-md" onclick="openPhotoModal('${p.foto}', 'Foto Problem')" alt="Foto Problem">
-            ` : ''}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderImprovementList() {
-      const container = document.getElementById('improvement-list');
-      
-      if (improvementList.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-8 text-slate-400">
-            <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            Belum ada improvement
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = improvementList.map(i => `
-        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
-          <div class="flex flex-col md:flex-row md:items-start gap-4">
-            <div class="flex-1">
-              <div class="font-semibold text-green-800 mb-1">💡 Improvement</div>
-              ${i.pic ? `<p class="text-slate-500 text-xs mb-1">PIC: ${i.pic}</p>` : ''}
-              <p class="text-slate-700 text-sm">${i.detail}</p>
-            </div>
-            ${i.foto ? `
-              <img src="${i.foto}" class="photo-thumbnail w-20 h-20 object-cover rounded-xl shadow-md" onclick="openPhotoModal('${i.foto}', 'Foto Improvement')" alt="Foto Improvement">
-            ` : ''}
-          </div>
-        </div>
-      `).join('');
-    }
-
     // ========== Photo Modal ==========
-    window.openPhotoModal = function(src, title) {
-      document.getElementById('modal-photo').src = src;
-      document.getElementById('modal-title').textContent = title;
-      document.getElementById('photo-modal').classList.remove('hidden');
+    window.openPhotoModal = function(src, title) { 
+      document.getElementById('modal-photo').src = src; 
+      document.getElementById('modal-title').textContent = title; 
+      document.getElementById('photo-modal').classList.remove('hidden'); 
     }
-
-    window.closePhotoModal = function() {
-      document.getElementById('photo-modal').classList.add('hidden');
+    
+    window.closePhotoModal = function() { 
+      document.getElementById('photo-modal').classList.add('hidden'); 
     }
-
-    document.getElementById('photo-modal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('photo-modal')) {
-        window.closePhotoModal();
-      }
-    });
 
     // ========== Utilities ==========
-    function formatDate(dateStr) {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('id-ID', { 
-        day: 'numeric', 
-        month: 'short', 
-        year: 'numeric' 
-      });
+    function formatDate(dateStr) { 
+      if (!dateStr) return '-';
+      const d = new Date(dateStr); 
+      return d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }); 
     }
-
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      
-      const colors = {
-        success: 'bg-green-500',
-        error: 'bg-red-500',
-        info: 'bg-blue-500'
-      };
-
-      toast.className = `toast ${colors[type]} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 max-w-sm`;
-      toast.innerHTML = `
-        ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
-        <span class="text-sm font-medium">${message}</span>
-      `;
-
-      container.appendChild(toast);
-
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
+    
+    function showToast(msg, type='info') {
+      const c = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      const colors = { success:'bg-green-500', error:'bg-red-500', info:'bg-blue-500' };
+      t.className = `toast ${colors[type]} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 max-w-sm`;
+      t.innerHTML = `${type==='success'?'✅':type==='error'?'❌':'ℹ️'} <span class="text-sm font-medium">${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => { 
+        t.style.opacity='0'; 
+        t.style.transform='translateX(100%)'; 
+        setTimeout(()=>t.remove(), 300); 
       }, 3000);
     }
 
     // ========== Initialize ==========
     document.addEventListener('DOMContentLoaded', async () => {
-      // Set default date to today
       document.getElementById('input-tanggal').valueAsDate = new Date();
-      
       await initElementSdk();
-      await autoConnect();
+      await connectSupabase();
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bd3311f92f2f91e',t:'MTc2ODI4OTQ2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
